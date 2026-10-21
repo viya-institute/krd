@@ -206,6 +206,21 @@ footer{box-shadow:none}
 @keyframes lvIn{from{opacity:0;transform:perspective(600px) rotateX(-70deg) translateY(20px)}}
 h2{text-shadow:1px 1px 0 #1b4a99,2px 2px 0 #153a78,3px 3px 0 #102c5a,4px 8px 14px rgba(0,0,0,.5)}
 .lang button{box-shadow:0 4px 0 #14367a}.dir{box-shadow:0 5px 0 #7a1230}
+
+/* ===== news ===== */
+.news{max-width:1100px;margin:0 auto 40px;padding:0 clamp(14px,4vw,30px)}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.ncard{background:linear-gradient(160deg,rgba(20,30,70,.85),rgba(10,15,40,.9));border:1px solid rgba(100,150,255,.22);border-radius:18px;overflow:hidden;animation:lvIn .7s both;transition:transform .3s,box-shadow .3s}
+.ncard:hover{transform:translateY(-6px);box-shadow:0 0 0 1px rgba(45,140,255,.6),0 18px 34px rgba(0,0,0,.5)}
+.ncard img{width:100%;height:200px;object-fit:cover;display:block}
+.ncard p{margin:12px 16px 4px;color:var(--ink)}
+.ncard time{display:block;margin:0 16px 14px;color:var(--mut);font-size:.85rem}
+.by-i{flex:none;position:relative;width:18px;height:18px;border-radius:50%;border:2px solid rgba(0,224,255,.25);border-top-color:#00e0ff;border-right-color:#ff3355;animation:orb 1.4s linear infinite}
+.by-i::after{content:"";position:absolute;inset:3px;border-radius:50%;background:#ffd166;animation:dotp 1.4s ease-in-out infinite alternate}
+.by-i:last-child{animation-direction:reverse;animation-delay:0s}
+@keyframes orb{to{transform:rotate(360deg)}}
+@keyframes dotp{to{transform:scale(.35);opacity:.6}}
+a.byw{color:inherit;text-decoration:none;cursor:pointer}
 </style>
 </head>
 <body>
@@ -230,20 +245,40 @@ h2{text-shadow:1px 1px 0 #1b4a99,2px 2px 0 #153a78,3px 3px 0 #102c5a,4px 8px 14p
 <h2 id="deptTitle"></h2>
 <main class="grid" id="grid"></main>
 
+<section id="news" class="news"><h2 id="newsTitle">Latest News</h2><div class="ngrid" id="ngrid"></div></section>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  var URL='YOUR_SUPABASE_URL',KEY='YOUR_ANON_KEY';
+  var g=document.getElementById('ngrid');
+  if(URL.indexOf('YOUR_')===0||typeof supabase==='undefined'){document.getElementById('news').style.display='none';return}
+  var sb=supabase.createClient(URL,KEY);
+  sb.from('news').select('*').order('created_at',{ascending:false}).then(function(r){
+    if(r.error||!r.data.length){document.getElementById('news').style.display='none';return}
+    r.data.forEach(function(n,i){
+      var c=document.createElement('article');c.className='ncard';c.style.animationDelay=(i*.12)+'s';
+      var im=document.createElement('img');im.src=n.image_url;im.alt='';im.loading='lazy';
+      var p=document.createElement('p');p.textContent=n.caption;
+      var t=document.createElement('time');t.textContent=new Date(n.created_at).toLocaleDateString();
+      c.append(im,p,t);g.append(c);
+    });
+  });
+})();
+</script>
 <h2 id="locTitle"></h2>
 <section class="map"><iframe title="Map" loading="lazy" src="https://www.google.com/maps?q=37.172956,42.701732&z=16&output=embed"></iframe><a class="dir" id="dir" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=37.172956,42.701732"></a></section>
 <div class="modal" id="modal"><div class="box" role="dialog" aria-modal="true"><button class="x" id="mx" aria-label="Close">✕</button><div class="gal" id="mgal"></div><div class="mi"><h3 id="mt"></h3><p id="mc"></p><div id="lvt"></div><div id="lvls"></div><div id="mf"></div><div class="cl" id="mcall"></div></div></div></div>
 <footer id="contact">
   <h2 id="ctTitle"></h2>
   <div class="cl" id="contactBottom"></div>
-  <div class="byw"><span class="by-i">✦</span><span id="by"></span><span class="by-i">✦</span></div>
+  <a class="byw" href="https://instagram.com/salar.sarbast" target="_blank" rel="noopener noreferrer"><span class="by-i"></span><span id="by"></span><span class="by-i"></span></a>
 </footer>
 
 <script>
 var T={
-ku:{dir:'rtl',l1:'پەیمانگەهێن ڤیا یێن تایبەت ل زاخو',l2:'پێشوازیێ ل دەرچوویێن پولا نەهێ بنەرەت دکەت.',l3:'بێ مەرجێ تەمەن و کونمران',l4:'تو دشێی لدەف مە بخوینی و بەردەوامیێ بدەیە خواندنا خو.',dept:'بەشێن مە',ct:'پەیوەندیێ ب مە بکە',by:'دیزاینکرن: سالار سەربەست',ph:'تەلەفۆن',ig:'ئینستاگرام',more:'زێدەتر ببینە',lv:'ئاستێ',st1:'قوناغا خواندنگەهێ',st2:'قوناغا پیشەیی ل پەیمانگەهێ',sc:'بابەتێن خواندنگەهێ',ds:'بابەتێن بەشی',lvt:'ئاستێن خواندنێ',adm:'زانیاریێن وەرگرتنێ',loc:'شوێنێ مە',dir:'رێنیشاندان ب گووگڵ مەپ'},
-ar:{dir:'rtl',l1:'معاهد فيا الأهلية في زاخو',l2:'ترحّب بخريجي الصف التاسع الأساسي.',l3:'دون شرط العمر أو الجنس',l4:'يمكنك الدراسة لدينا ومواصلة تعليمك.',dept:'أقسامنا',ct:'اتصل بنا',by:'تصميم: سالار سربست',ph:'هاتف',ig:'إنستغرام',more:'عرض التفاصيل',lv:'المستوى',st1:'المرحلة الدراسية',st2:'المرحلة المهنية (المعهد)',sc:'المواد الدراسية',ds:'مواد القسم',lvt:'مستويات الدراسة',adm:'معلومات القبول',loc:'موقعنا',dir:'احصل على الاتجاهات'},
-en:{dir:'ltr',l1:'Viya Private Institutes in Zakho',l2:'We welcome graduates of the 9th grade (basic education).',l3:'No age or gender restrictions',l4:'You can study with us and continue your education.',dept:'Our Departments',ct:'Contact us',by:'Designed by Salar Sarbast',ph:'Phone',ig:'Instagram',more:'View details',lv:'Level',st1:'School stage',st2:'Professional institute stage',sc:'School subjects',ds:'Department subjects',lvt:'Study levels',adm:'Admission info',loc:'Our Location',dir:'Get directions'}};
+ku:{dir:'rtl',l1:'پەیمانگەهێن ڤیا یێن تایبەت ل زاخو',l2:'پێشوازیێ ل دەرچوویێن پولا نەهێ بنەرەت دکەت.',l3:'بێ مەرجێ تەمەن و کونمران',l4:'تو دشێی لدەف مە بخوینی و بەردەوامیێ بدەیە خواندنا خو.',dept:'بەشێن مە',ct:'پەیوەندیێ ب مە بکە',by:'دیزاینکرن: @سالار سەربەست',ph:'تەلەفۆن',ig:'ئینستاگرام',more:'زێدەتر ببینە',lv:'ئاستێ',st1:'قوناغا خواندنگەهێ',st2:'قوناغا پیشەیی ل پەیمانگەهێ',sc:'بابەتێن خواندنگەهێ',ds:'بابەتێن بەشی',lvt:'ئاستێن خواندنێ',adm:'زانیاریێن وەرگرتنێ',loc:'شوێنێ مە',dir:'رێنیشاندان ب گووگڵ مەپ'},
+ar:{dir:'rtl',l1:'معاهد فيا الأهلية في زاخو',l2:'ترحّب بخريجي الصف التاسع الأساسي.',l3:'دون شرط العمر أو الجنس',l4:'يمكنك الدراسة لدينا ومواصلة تعليمك.',dept:'أقسامنا',ct:'اتصل بنا',by:'تصميم: @سالار سربست',ph:'هاتف',ig:'إنستغرام',more:'عرض التفاصيل',lv:'المستوى',st1:'المرحلة الدراسية',st2:'المرحلة المهنية (المعهد)',sc:'المواد الدراسية',ds:'مواد القسم',lvt:'مستويات الدراسة',adm:'معلومات القبول',loc:'موقعنا',dir:'احصل على الاتجاهات'},
+en:{dir:'ltr',l1:'Viya Private Institutes in Zakho',l2:'We welcome graduates of the 9th grade (basic education).',l3:'No age or gender restrictions',l4:'You can study with us and continue your education.',dept:'Our Departments',ct:'Contact us',by:'Designed by @Salar Sarbast',ph:'Phone',ig:'Instagram',more:'View details',lv:'Level',st1:'School stage',st2:'Professional institute stage',sc:'School subjects',ds:'Department subjects',lvt:'Study levels',adm:'Admission info',loc:'Our Location',dir:'Get directions'}};
 var D=[
 {k:'gas-oil',i:'⛽',g:'linear-gradient(135deg,#ff7a18,#e8000d)',
  t:{ku:'بەشێ گاز و نەفتێ',ar:'قسم الغاز والنفط',en:'Department of Gas and Oil'},
